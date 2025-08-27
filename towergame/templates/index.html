@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tower Building Game</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
+    <style>
+        body { margin: 0; padding: 0; background: #222; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+<script>
+    const config = {
+        type: Phaser.AUTO,
+        width: 400,
+        height: 600,
+        backgroundColor: '#87CEEB',
+        physics: {
+            default: 'arcade',
+            arcade: { gravity: { y: 300 }, debug: false }
+        },
+        scene: { preload, create, update }
+    };
+
+    let tower = [];
+    let movingBlock;
+    let direction = 1;
+    let speed = 2;
+    let gameOver = false;
+
+    const game = new Phaser.Game(config);
+
+    function preload() {
+        this.load.image('block', 'https://i.imgur.com/Ws6xj5D.png');
+    }
+
+    function create() {
+        this.input.on('pointerdown', () => dropBlock.call(this));
+        addBlock.call(this, 200, 550);
+        movingBlock = this.add.image(200, 200, 'block').setOrigin(0.5);
+    }
+
+    function update() {
+        if (!gameOver) {
+            movingBlock.x += speed * direction;
+            if (movingBlock.x > 350 || movingBlock.x < 50) {
+                direction *= -1;
+            }
+        }
+    }
+
+    function dropBlock() {
+        if (gameOver) return;
+        const lastBlock = tower[tower.length - 1];
+        if (Math.abs(movingBlock.x - lastBlock.x) > 50) {
+            this.add.text(100, 300, 'Game Over', { fontSize: '32px', fill: '#fff' });
+            gameOver = true;
+            return;
+        }
+        addBlock.call(this, movingBlock.x, lastBlock.y - 30);
+    }
+
+    function addBlock(x, y) {
+        const block = this.add.image(x, y, 'block').setOrigin(0.5);
+        tower.push(block);
+    }
+</script>
+</body>
+</html>
